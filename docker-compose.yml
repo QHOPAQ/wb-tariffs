@@ -1,0 +1,60 @@
+services:
+
+  postgres:
+    image: postgres:15-alpine   # alpine легче, быстрее стартует
+    container_name: wb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"             # 5433 снаружи, чтобы не конфликтовал с локальным postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile    # если файл называется нестандартно 
+    container_name: wb-app
+    depends_on:
+      postgres:
+        condition: service_healthy   # ждём, пока postgres реально готов
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      
+      # База - берём из postgres-сервиса
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      
+      # WB - если пусто, просто не будет синхронизироваться
+      - WB_API_TOKEN=
+      
+      # Google Sheets — если ничего не указано, синхронизация выключится
+      - GOOGLE_SPREADSHEET_IDS=
+      - GOOGLE_SHEET_NAME=stocks_coefs
+      - GOOGLE_SERVICE_ACCOUNT_BASE64=
+      - GOOGLE_SERVICE_ACCOUNT_FILE=
+      
+      # можно добавить, если нужно больше логов
+      # - LOG_LEVEL=debug
+
+    ports:
+      - "3000:3000"
+    
+    command: >
+      sh -c "npm run migrate && npm start"
+    restart: on-failure
+
+volumes:
+  pgdata:
