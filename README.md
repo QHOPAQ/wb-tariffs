@@ -25,10 +25,10 @@ https://common-api.wildberries.ru/api/v1/tariffs/box
 
 Четыре слоя:
 
-**Integration** — клиент WB API + валидация ответа  
-**Persistence** — PostgreSQL + Knex (миграции, upsert по `date + warehouse_name`)  
-**Export** — Google Sheets API, поддержка нескольких spreadsheet  
-**Scheduler** — node-cron с проверкой наличия токенов
+**Integration** - клиент WB API + валидация ответа  
+**Persistence** - PostgreSQL + Knex (миграции, upsert по `date + warehouse_name`)  
+**Export** - Google Sheets API, поддержка нескольких spreadsheet  
+**Scheduler** - node-cron с проверкой наличия токенов
 
 ---
 
@@ -68,7 +68,7 @@ https://common-api.wildberries.ru/api/v1/tariffs/box
 **Wildberries**  
 • Запрос раз в час  
 • UPSERT в течение дня по текущей дате  
-• Новый день — новые записи
+• Новый день - новые записи
 
 **Google Sheets**  
 • Экспорт раз в 6 часов  
@@ -109,7 +109,7 @@ DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=postgres
 
-# Wildberries (если нет — fetch просто отключится)
+# Wildberries (если нет - fetch просто отключится)
 WB_API_TOKEN=...
 
 # Google Sheets
@@ -134,10 +134,10 @@ GOOGLE_SERVICE_ACCOUNT_BASE64=eyJ0eXBlIjoic2...      # base64 json
 
 ## Почему выбрано именно так
 
-- **Knex** — миграции + upsert без копипасты сырого SQL  
-- **отдельные job-файлы** — проще тестировать и расширять  
-- **idempotency** — повторный запуск ничего не ломает  
-- **graceful degradation** — сервис живой даже без токенов (удобно для dev/test/CI)
+- **Knex** - миграции + upsert без копипасты сырого SQL  
+- **отдельные job-файлы** - проще тестировать и расширять  
+- **idempotency** - повторный запуск ничего не ломает  
+- **graceful degradation** - сервис живой даже без токенов (удобно для dev/test/CI)
 
 ---
 
